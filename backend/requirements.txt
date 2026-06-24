@@ -1,0 +1,12 @@
+pqcrypto==0.4.0
+pillow>=10.0.0
+numpy>=1.26.0
+fastapi>=0.110.0
+uvicorn>=0.27.0
+python-multipart>=0.0.9
+sqlalchemy>=2.0.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+psycopg2-binary>=2.9.0   # optional: only needed if DATABASE_URL points at Postgres
+redis>=5.0.0              # optional: only needed if REDIS_URL is set
+sentry-sdk>=1.40.0         # optional: only needed if SENTRY_DSN is set
