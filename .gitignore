@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+backend/keys/
+backend/uploads/
+backend/secured_media/
+backend/*.db
+.env
+venv/
+node_modules/
+frontend/dist/
+*.crx
+*.pem
