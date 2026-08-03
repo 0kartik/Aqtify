@@ -64,8 +64,12 @@ class Settings:
     # -----------------------------------------------------------
     # AI-detection gate (feature: block/flag AI-generated media at registration)
     # -----------------------------------------------------------
-    AI_FLAG_THRESHOLD = _int("AQTIFY_AI_FLAG_THRESHOLD", 10)   # % -- above this: flagged for review, still registers
-    AI_BLOCK_THRESHOLD = _int("AQTIFY_AI_BLOCK_THRESHOLD", 60)  # % -- above this: registration is rejected outright
+    AI_FLAG_THRESHOLD = _int("AQTIFY_AI_FLAG_THRESHOLD", 60)   # % -- above this: flagged for human review, still registers
+    AI_BLOCK_THRESHOLD = _int("AQTIFY_AI_BLOCK_THRESHOLD", 85)  # % -- above this: registration is rejected outright
+    # Widened from 75% after testing showed a single model can be
+    # confidently wrong on real photos; 85%+ is reserved for cases the
+    # model is very unlikely to be flipping on. 60-85% always goes to
+    # human review rather than being auto-rejected.
 
     # -----------------------------------------------------------
     # Secrets / auth
