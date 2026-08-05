@@ -51,19 +51,54 @@ class PQSMAPEngine:
     # -----------------------------------------------------------
     def _run_ai_gate(self, file_path, media_type):
         """
-        Runs before anything else for images. Returns:
+        Runs before anything else, for images, audio, and video. Returns:
             (allowed: bool, ai_probability: int|None, review_status: str, block_reason: str|None)
         review_status is one of "clear" | "flagged" (still registers, queued for review).
-        Videos/audio aren't screened (the heuristic detector only supports images).
+
+        Fail-safe: if no detection model is available for this media type,
+        registration is NOT silently allowed through. It's blocked and
+        logged loudly, because a broken detector must never be
+        indistinguishable from a passed check.
         """
-        if media_type != "image":
+        if media_type not in ("image", "audio", "video"):
             return True, None, "clear", None
 
-        result = self.detector.analyze_media(file_path)
+        if media_type == "video":
+            result = self.detector.analyze_media(file_path, media_type="video", video_processor=self.video)
+        else:
+            result = self.detector.analyze_media(file_path, media_type=media_type)
+
         if not result.get("supported"):
-            return True, None, "clear", None
+            error_detail = result.get("error", "unknown error")
+            logger.error(
+                "AI-detection gate could not run for %s (model unavailable): %s. "
+                "Registration blocked -- the gate must fail closed, not open.",
+                media_type, error_detail,
+            )
+            return (
+                False, None, "rejected",
+                f"AI-detection model is unavailable for {media_type} ({error_detail}). "
+                "Registration cannot proceed without a working AI-generation check. "
+                "Run backend/download_model.py and confirm the model(s) load, then retry.",
+            )
 
         ai_probability = int(result.get("ai_probability", 0))
+
+        # Always log the per-model breakdown -- this is what lets us see
+        # WHICH model in the ensemble is driving a given score, instead of
+        # only ever seeing the final averaged number.
+        if media_type == "image" and result.get("ensemble"):
+            logger.info(
+                "Image AI-detection ensemble breakdown: %s -> averaged %.1f%%",
+                result["ensemble"], ai_probability,
+            )
+        elif media_type == "video" and result.get("frame_scores"):
+            logger.info(
+                "Video AI-detection frame scores: %s -> worst frame %.1f%% (avg %.1f%%)",
+                result["frame_scores"], ai_probability, result.get("average_across_frames", 0),
+            )
+        else:
+            logger.info("%s AI-detection score: %.1f%%", media_type, ai_probability)
 
         if ai_probability > settings.AI_BLOCK_THRESHOLD:
             return (
