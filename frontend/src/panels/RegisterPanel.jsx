@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Panel from "../components/Panel.jsx";
 import Dropzone from "../components/Dropzone.jsx";
 import Field from "../components/Field.jsx";
@@ -10,6 +10,7 @@ import ErrorBox from "../components/ErrorBox.jsx";
 import VerdictBanner from "../components/VerdictBanner.jsx";
 import DataRow from "../components/DataRow.jsx";
 import BeforeAfterSlider from "../components/BeforeAfterSlider.jsx";
+import ReviewFlagModal from "../components/ReviewFlagModal.jsx";
 import { registerMedia, downloadSecured } from "../api/client.js";
 import { openCertificatePdf } from "../utils/certificatePdf.js";
 
@@ -25,11 +26,13 @@ export default function RegisterPanel({ apiBase, apiKey }) {
   const [result, setResult] = useState(null);
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [originalPreviewUrl, setOriginalPreviewUrl] = useState(null);
+  const [showFlagModal, setShowFlagModal] = useState(false);
 
   const run = async () => {
     setError("");
     setResult(null);
     setDownloadUrl(null);
+    setShowFlagModal(false);
 
     if (!file) return setError("Choose a file first.");
     if (!apiKey) return setError("Set an API key above first.");
@@ -49,6 +52,13 @@ export default function RegisterPanel({ apiBase, apiKey }) {
       setResult(data);
       const blob = await downloadSecured(apiBase, apiKey, data.certificate_id);
       setDownloadUrl(URL.createObjectURL(blob));
+
+      // Fire the review pop-up immediately for flagged registrations,
+      // rather than making the user notice a static banner or dig
+      // through the review queue later.
+      if (data.review_status === "flagged") {
+        setShowFlagModal(true);
+      }
     } catch (e) {
       setError(e.message || `Could not reach the API at ${apiBase}. Is the backend running?`);
     }
@@ -145,8 +155,17 @@ export default function RegisterPanel({ apiBase, apiKey }) {
             <Button variant="ghost" onClick={downloadCertificate}>
               <Icon name="doc" size={14} /> Download certificate (PDF)
             </Button>
+            {result.review_status === "flagged" && (
+              <Button variant="ghost" onClick={() => setShowFlagModal(true)}>
+                <Icon name="alert" size={14} /> View flag details
+              </Button>
+            )}
           </div>
         </div>
+      )}
+
+      {showFlagModal && (
+        <ReviewFlagModal result={result} onDismiss={() => setShowFlagModal(false)} />
       )}
     </Panel>
   );
