@@ -10,6 +10,7 @@ import ErrorBox from "../components/ErrorBox.jsx";
 import VerdictBanner from "../components/VerdictBanner.jsx";
 import CheckGrid from "../components/CheckGrid.jsx";
 import DataRow from "../components/DataRow.jsx";
+import AIDetectionBreakdown from "../components/AIDetectionBreakdown.jsx";
 import { verifyMedia, fetchManifest, fetchCustodyLog } from "../api/client.js";
 
 const STEPS = ["Extract", "Hash Check", "Signature", "AI Scan", "Score"];
@@ -104,12 +105,14 @@ export default function VerifyPanel({ apiBase, apiKey }) {
             subtitle={`${result.risk_level} · certificate ${result.certificate_id}`}
           />
           <CheckGrid checks={result.checks} />
+
+          <AIDetectionBreakdown analysis={result.ai_analysis} />
+
           <div style={{ border: "1px solid var(--border)", borderRadius: 8, padding: "4px 14px", marginBottom: 16 }}>
             <DataRow k="certificate_id" v={result.certificate_id} copyable />
             <DataRow k="file_hash" v={result.file_hash} copyable />
             <DataRow k="owner" v={result.owner || "—"} />
             <DataRow k="key_mode" v={result.key_mode} />
-            <DataRow k="ai_probability" v={(result.ai_analysis.ai_probability ?? "n/a") + "%"} />
             <DataRow k="timestamp" v={result.timestamp} />
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
