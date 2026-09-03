@@ -43,9 +43,6 @@ export default function KeyBar({ apiBase, apiKey, onChange }) {
   return (
     <div
       style={{
-        maxWidth: 920,
-        margin: "16px auto 0",
-        padding: "0 24px",
         display: "flex",
         gap: 10,
         alignItems: "center",
