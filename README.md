@@ -18,7 +18,7 @@ Cryptographically sign, watermark, and verify the authenticity of images, audio,
 
 ## Overview
 
-Aqtify (also referred to as **PQ-SMAP**) tackles a problem that gets harder every year: proving a piece of media is what it claims to be, in a world of AI-generated content and (eventually) quantum-capable adversaries.
+Aqtify (also referred to as **PQ-SMAP**) tackles a problem that gets harder every year: proving a piece of media is what it claims to be, in a world of AI-generated content and (eventually) quantum-capable adversaries
 
 Every file registered through Aqtify is:
 
