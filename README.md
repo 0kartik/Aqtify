@@ -13,7 +13,6 @@ Cryptographically sign, watermark, and verify the authenticity of images, audio,
 [![License](https://img.shields.io/badge/status-prototype-orange)](#)
 
 </div>
-
 ---
 
 ## Overview
