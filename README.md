@@ -108,7 +108,7 @@ Runs with **zero configuration** out of the box (SQLite + in-memory rate limitin
 ```bash
 cd frontend
 npm install
-npm run dev        # http://localhost:5173
+npm run dev        # http://localhost:5173 
 ```
 
 ### CLI
